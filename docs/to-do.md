@@ -1,0 +1,5 @@
+- Add packages pre-check
+- Add optional packages (eg: yq for yaml formatted files)
+- Empty domains list exception
+- All exceptions to .errors list
+- Add query timestamps

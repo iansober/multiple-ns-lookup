@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# import json or yaml formatted configuration file
-# configuration file should be named config.json or config.yaml
-# fail if config does not exist or invalid
 # INPUT:    $1 = script directory
 # OUTPUT:   json-formatted config
 function import_config {
@@ -14,13 +11,10 @@ function import_config {
     return 1
 }
 
-# check if output format is defined and allowed
-# set json if not defined
-# exit if not allowed
 # INPUT:    $1 = json-formatted config
 # OUTPUT:   result output format (string)
 function define_output {
-    local -a allowed_format=(json pretty_json)
+    local -a allowed_format=(json pretty_json yaml)
     local output_format
     output_format=$(jq -r -M .output <<<"$1" | sed "s/null/json/")
     if [[ ! "${allowed_format[*]}" =~ $output_format ]]; then 

@@ -7,11 +7,11 @@ Default input is `config.json`, then try `config.yaml`.
 YAML example:
 ```
 ---
-output: json            # Values: json, pretty_json. Default is json. Optional. 
+output: json            # Values: json, pretty_json, yaml. Default is json. Optional. 
 nameservers:            # List of nameservers. Required.
   - 8.8.8.8
   - 1.1.1.1
-lookup:                # List of records. Required.
+lookup:                 # List of records. Required.
   - type: A             # Record type. Default is A. Optional.
     zone: com           # Zone. Optional.
     domains:            # List of domains of specified zones. Required.
