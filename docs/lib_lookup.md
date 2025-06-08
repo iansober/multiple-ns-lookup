@@ -6,13 +6,39 @@ Parses .nameservers list from json formatted configuration file.
 
 **Input**:
 1. Json formatted config.
+
+**Output**: array of nameservers
+
+### Examples:
+
+#### 1. *Input*:
 ```
 {"output":"yaml","nameservers":["8.8.8.8","127.0.0.1"],"lookup":[{"type":"MX","domains":["google.com","example.com"]},{"zone":"com","domains":["google","www.example"]}]}
 ```
 
-**Output**: array of nameservers
+*Output*:
 ```
 8.8.8.8 127.0.0.1
+```
+
+#### 2. *Input*:
+```
+{"output":"yaml","nameservers":[],"lookup":[{"type":"MX","domains":["google.com"]},{"zone":"com","domains":["google","www.example","github"]}]}
+```
+
+*Output*:
+```
+```
+
+#### 3. *Input*:
+```
+{"output":"yaml","lookup":[{"type":"MX","domains":["google.com"]},{"zone":"com","domains":["google","www.example","github"]}]}
+```
+
+*Output*:
+```
+Error parsing nameservers
+++ return 1
 ```
 
 ## function parse_lookup_zone
@@ -104,13 +130,24 @@ www.example
 
 #### 2. *Input*:
 ```
-{"zone":"com"}
+{"type":"MX","domains":[]}
 ```
 
 *Output*:
 ```
-jq: error (at <stdin>:1): Cannot iterate over null (null)
 ```
+
+#### 3. *Input*:
+```
+{"type":"MX"}
+```
+
+*Output*:
+```
+Error parsing domains
+++ return 1
+```
+
 
 ## function lookup_domain
 

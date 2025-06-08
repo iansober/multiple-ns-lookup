@@ -40,7 +40,7 @@ www.example.com-v4.edgesuite.net. a1422.dscr.akamai.net. 2.16.53.33 2.16.53.27
 ["140.82.121.3"]
 ```
 
-## function format_json
+## function format_lookup_json
 
 Transforms DNS lookup result to json.
 
@@ -81,7 +81,7 @@ Appends json formatted lookup result to .data[].
 
 **Input**:
 1. Json formatted lookup result (format_json)
-2. Json formatted array with data
+2. Json formatted results array
 
 **Output**: aggregated lookup results in json format
 
@@ -105,6 +105,38 @@ Appends json formatted lookup result to .data[].
 *Output*:
 ```
 {"data":[{"nameserver":"8.8.8.8","zone":"","type":"MX","domain":"google.com","fqdn":"google.com","records":["10 smtp.google.com."]},{"nameserver":"8.8.8.8","zone":".com","type":"A","domain":"google","fqdn":"google.com","records":["142.250.150.138","142.250.150.113","142.250.150.102","142.250.150.139","142.250.150.100","142.250.150.101"]}],"errors":[]}
+```
+
+## function append_error
+
+Appends json formatted errors to .errors[].
+
+**Input**:
+1. Json formatted error
+2. Json formatted results array
+
+**Output**: aggregated lookup results in json format
+
+### Examples:
+
+#### 1. *Input*:
+```
+'Error trying nameserver 127.0.0.1, exclude from dns lookup' '{"data":[],"errors":[]}'
+```
+
+*Output*:
+```
+{"data":[],"errors":["Error trying nameserver 127.0.0.1, exclude from dns lookup"]}
+```
+
+#### 2. *Input*:
+```
+'Error trying nameserver 1277.0.0.1, exclude from dns lookup' '{"data":[],"errors":["Error trying nameserver 127.0.0.1, exclude from dns lookup"]}'
+```
+
+*Output*:
+```
+{"data":[],"errors":["Error trying nameserver 127.0.0.1, exclude from dns lookup","Error trying nameserver 1277.0.0.1, exclude from dns lookup"]}
 ```
 
 ## function json_to_yaml
@@ -163,4 +195,83 @@ data:
     records:
       - 140.82.121.3
 errors: []
+```
+#### 2. *Input*:
+```
+'{"data":[{"nameserver":"8.8.8.8","zone":"","type":"MX","domain":"google.com","fqdn":"google.com","records":["10 smtp.google.com."]},{"nameserver":"1.1.1.1","zone":"","type":"MX","domain":"google.com","fqdn":"google.com","records":["10 smtp.google.com."]},{"nameserver":"8.8.8.8","zone":".com","type":"A","domain":"google","fqdn":"google.com","records":["142.250.150.113","142.250.150.102","142.250.150.101","142.250.150.100","142.250.150.138","142.250.150.139"]},{"nameserver":"1.1.1.1","zone":".com","type":"A","domain":"google","fqdn":"google.com","records":["142.250.186.110"]},{"nameserver":"8.8.8.8","zone":".com","type":"A","domain":"www.example","fqdn":"www.example.com","records":["www.example.com-v4.edgesuite.net.","a1422.dscr.akamai.net.","2.16.53.33","2.16.53.27"]},{"nameserver":"1.1.1.1","zone":".com","type":"A","domain":"www.example","fqdn":"www.example.com","records":["www.example.com-v4.edgesuite.net.","a1422.dscr.akamai.net.","2.19.126.157","2.19.126.156"]},{"nameserver":"8.8.8.8","zone":".com","type":"A","domain":"github","fqdn":"github.com","records":["140.82.121.3"]},{"nameserver":"1.1.1.1","zone":".com","type":"A","domain":"github","fqdn":"github.com","records":["140.82.121.4"]}],"errors":["Error trying nameserver 127.0.0.1, exclude from dns lookup","Error trying nameserver 1277.0.0.1, exclude from dns lookup"]}'
+```
+
+*Output*:
+```
+data:
+  - nameserver: 8.8.8.8
+    zone: ''
+    type: MX
+    domain: google.com
+    fqdn: google.com
+    records:
+      - 10 smtp.google.com.
+  - nameserver: 1.1.1.1
+    zone: ''
+    type: MX
+    domain: google.com
+    fqdn: google.com
+    records:
+      - 10 smtp.google.com.
+  - nameserver: 8.8.8.8
+    zone: .com
+    type: A
+    domain: google
+    fqdn: google.com
+    records:
+      - 142.250.150.113
+      - 142.250.150.102
+      - 142.250.150.101
+      - 142.250.150.100
+      - 142.250.150.138
+      - 142.250.150.139
+  - nameserver: 1.1.1.1
+    zone: .com
+    type: A
+    domain: google
+    fqdn: google.com
+    records:
+      - 142.250.186.110
+  - nameserver: 8.8.8.8
+    zone: .com
+    type: A
+    domain: www.example
+    fqdn: www.example.com
+    records:
+      - www.example.com-v4.edgesuite.net.
+      - a1422.dscr.akamai.net.
+      - 2.16.53.33
+      - 2.16.53.27
+  - nameserver: 1.1.1.1
+    zone: .com
+    type: A
+    domain: www.example
+    fqdn: www.example.com
+    records:
+      - www.example.com-v4.edgesuite.net.
+      - a1422.dscr.akamai.net.
+      - 2.19.126.157
+      - 2.19.126.156
+  - nameserver: 8.8.8.8
+    zone: .com
+    type: A
+    domain: github
+    fqdn: github.com
+    records:
+      - 140.82.121.3
+  - nameserver: 1.1.1.1
+    zone: .com
+    type: A
+    domain: github
+    fqdn: github.com
+    records:
+      - 140.82.121.4
+errors:
+  - Error trying nameserver 127.0.0.1, exclude from dns lookup
+  - Error trying nameserver 1277.0.0.1, exclude from dns lookup
 ```

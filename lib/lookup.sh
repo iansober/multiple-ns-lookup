@@ -3,7 +3,8 @@
 # INPUT:    $1 = json formatted config
 # OUTPUT:   array of nameservers
 function parse_nameservers {
-    jq -c -r -M .nameservers[] <<<"$1" 2>/dev/stderr
+    jq -c -r -M .nameservers[] <<<"$1" 2>/dev/null || \
+        { echo "Error parsing nameservers" >>/dev/stderr; return 1; }
 }
 
 # INPUT:    $1 = json formatted .lookup[] item
@@ -24,7 +25,8 @@ function parse_lookup_record_type {
 # INPUT:    $1 = json formatted .lookup[] item
 # OUTPUT:   array of domains
 function parse_lookup_domains {
-    jq -c -r -M .domains[] <<<"$1" 2>/dev/stderr
+    jq -c -r -M .domains[] <<<"$1" 2>/dev/null || \
+        { echo "Error parsing domains" >>/dev/stderr; return 1; }
 }
 
 # INPUT:    $1 = nameserver (string)

@@ -17,7 +17,7 @@ function array_to_json {
 #           $4 = lookup[].domain
 #           $5 = dns lookup result as json formatted array (array_to_json)
 # OUTPUT:   json formatted lookup result
-function format_json {
+function format_lookup_json {
     jq -n -c \
         --arg nameserver "$1" \
         --arg zone "$2" \
@@ -29,12 +29,21 @@ function format_json {
 }
 
 # INPUT:    $1 = json formatted lookup result (format_json)
-#           $2 = json formatted array with data
+#           $2 = json formatted results array
 # OUTPUT:   aggregated lookup results in json format
-function append_result {
+function append_lookup_result {
     jq -c \
         --argjson lookup_json "$1" \
         '.data += [$lookup_json]' <<<"$2"
+}
+
+# INPUT:    $1 = json formatted error
+#           $2 = json formatted results array
+# OUTPUT:   aggregated errors in json format
+function append_error {
+    jq -c \
+        --arg lookup_json "$1" \
+        '.errors += [$lookup_json]' <<<"$2"
 }
 
 # INPUT:    $1 = json formatted lookup result (format_json)
