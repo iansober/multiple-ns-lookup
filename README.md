@@ -15,7 +15,7 @@ Currently supported output formats:
 
 ```mermaid
 zenuml
-title multiple-ns-lookup
+    title multiple-ns-lookup
     "142.250.185.101" = "./dns-checker.sh"->"1.1.1.1"."mail.google.com A?"
     "142.250.186.78" = "./dns-checker.sh"->"1.1.1.1"."meet.google.com A?"
     "173.194.73.83" = "./dns-checker.sh"->"8.8.8.8"."mail.google.com A?"
