@@ -13,7 +13,36 @@ Currently supported output formats:
 - Pretty JSON
 - YAML
 
-![image](https://github.com/user-attachments/assets/7e3b0965-ed40-428e-8a25-9c88dbe9fa9a)
+```mermaid
+sequenceDiagram
+    activate dns-checker.sh
+    dns-checker.sh->>1.1.1.1: mail.google.com A?
+    activate 1.1.1.1
+    1.1.1.1-->>dns-checker.sh: 142.250.185.101
+    deactivate 1.1.1.1
+    dns-checker.sh->>1.1.1.1: meet.google.com A?
+    activate 1.1.1.1
+    1.1.1.1-->>dns-checker.sh: 142.250.186.78
+    deactivate 1.1.1.1
+    dns-checker.sh->>8.8.8.8: mail.google.com A?
+    activate 8.8.8.8
+    8.8.8.8-->>dns-checker.sh: 173.194.73.83
+    deactivate 8.8.8.8
+    dns-checker.sh->>8.8.8.8: meet.google.com A?
+    activate 8.8.8.8
+    8.8.8.8-->>dns-checker.sh: 173.194.221.113
+    deactivate 8.8.8.8
+    dns-checker.sh->>1.1.1.1: google.com MX?
+    activate 1.1.1.1
+    1.1.1.1-->>dns-checker.sh: 10 smtp.google.com.
+    deactivate 1.1.1.1
+    dns-checker.sh->>8.8.8.8: google.com MX?
+    activate 8.8.8.8
+    8.8.8.8-->>dns-checker.sh: 10 smtp.google.com.
+    deactivate 8.8.8.8
+    dns-checker.sh-)Json or yaml output: Aggregated DNS lookup results
+    deactivate dns-checker.sh
+```
 
 # Requirements
 
