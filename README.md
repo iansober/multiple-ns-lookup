@@ -13,6 +13,18 @@ Currently supported output formats:
 - Pretty JSON
 - YAML
 
+```mermaid
+zenuml
+title multiple-ns-lookup
+    "142.250.185.101" = "./dns-checker.sh"->"1.1.1.1"."mail.google.com A?"
+    "142.250.186.78" = "./dns-checker.sh"->"1.1.1.1"."meet.google.com A?"
+    "173.194.73.83" = "./dns-checker.sh"->"8.8.8.8"."mail.google.com A?"
+    "173.194.221.113" = "./dns-checker.sh"->"8.8.8.8"."meet.google.com A?"
+    "10 smtp.google.com." = "./dns-checker.sh"->"1.1.1.1"."google.com MX?"
+    "10 smtp.google.com." = "./dns-checker.sh"->"8.8.8.8"."google.com MX?"
+    "./dns-checker.sh"->"Output file (JSON/YAML)": Aggregated lookup results
+```
+
 # Requirements
 
 Required utilities:
