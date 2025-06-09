@@ -2,30 +2,44 @@
 
 ```mermaid
 stateDiagram
-    [*] --> Prephase
-    state Prephase {
-        loadLibraries --> configuration.sh
-        loadLibraries --> lookup.sh
-        loadLibraries --> formatter.sh
+    [*] --> loadLibraries
+    loadLibraries: Load libraries
+    state loadLibraries {
+        configuration.sh
+        core.sh
     }
 
-    Prephase --> loadConfig
+    loadLibraries --> loadConfig: libraries loaded
     loadConfig: Load configuration
     state loadConfig {
-        importConfig --> tryConfigFile
-        tryConfigFile --> config.json: config.json
-        tryConfigFile --> config.yaml: !config.json
+        importConfig --> config.json: config.json
+        importConfig --> config.yaml: !config.json
         config.json --> validateConfig
         config.yaml --> validateConfig
-        validateConfig --> getOutputFormat: valid
+        validateConfig --> getOutputFormat
     }
 
-    loadConfig --> lookup
+    loadConfig --> validateLists: config and output format are valid
+    validateLists: Validate required lists
+    state validateLists {
+        checkNameserversList: .nameservers[]
+        checkLookupList: .lookup[]
+    }
+
+    validateLists --> tryNameservers: nameservers and lookup lists are defined
+    tryNameservers: Validate nameserver availability
+    state tryNameservers {
+        checkList --> lookupNameservers: nameservers list is not empty
+        lookupNameservers --> unsetNotValid: not valid or available
+        checkList: validate nameservers list
+        unsetNotValid: remove not available from the list
+    }
+
+    tryNameservers --> lookup: nameservers list formed
     lookup: DNS lookup
     state lookup {
-        parseNameservers --> parseRecords
-        parseRecords --> dig
-        dig: lookup choosen record type of domain from name server
+        checkDomains --> lookupDNSRecord: if domains not empty
+        lookupDNSRecord: lookup DNS record
     }
 
     lookup --> formatOutput
