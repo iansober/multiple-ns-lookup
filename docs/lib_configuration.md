@@ -1,5 +1,7 @@
 # lib/configuration.sh
 
+Library for handle configuration file.
+
 ## function import_config
 
 Imports json or yaml formatted configuration file. 
