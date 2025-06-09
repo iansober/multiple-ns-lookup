@@ -187,7 +187,7 @@ m.root-servers.net.'
 142.250.150.138
 ```
 
-#### 3. *Input*:
+##### 3. *Input*:
 ```
 1.1.1.1 google.com '' MX
 ```
