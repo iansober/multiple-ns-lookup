@@ -36,6 +36,5 @@ stateDiagram
 
 # Libraries
 
-- [configuration.sh](./lib_configuration.md)
-- [lookup.sh](./lib_lookup.md)
-- [formatter.sh](./lib_formatter.md)
+- [configuration.sh](./lib_configuration.md) Library for handle configuration file.
+- [core.sh](./lib_core.md) Contains mostly used functions.

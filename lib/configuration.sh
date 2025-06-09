@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# INPUT:    $1 = script directory
-# OUTPUT:   json-formatted config
 function import_config {
     [[ -a "$1/config.json" ]] && \
         { jq -c -M . "$1/config.json" && return 0 || return 1; }
@@ -11,8 +9,6 @@ function import_config {
     return 1
 }
 
-# INPUT:    $1 = json-formatted config
-# OUTPUT:   result output format (string)
 function define_output {
     local -a allowed_format=(json pretty_json yaml)
     local output_format
