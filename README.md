@@ -144,6 +144,11 @@ Configuration:
 }
 ```
 
+Run script:
+```
+chmod +x dns-checker.sh && ./dns-checker.sh
+```
+
 Output:
 ```
 {
