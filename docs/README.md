@@ -2,7 +2,10 @@
 
 ```mermaid
 stateDiagram
-    [*] --> loadLibraries
+    [*] --> checkPackages
+    checkPackages: Check if required packages installed
+    
+    checkPackages --> loadLibraries
     loadLibraries: Load libraries
     state loadLibraries {
         configuration.sh
