@@ -15,6 +15,10 @@ OUTPUT_FORMAT=$(define_output "$CONFIG") || exit 1
 json_parse ".nameservers[]" "$CONFIG" 1>/dev/null || { echo "Error: No nameservers list in config" >>/dev/stderr; exit 1; }
 json_parse ".lookup[]" "$CONFIG" 1>/dev/null || { echo "Error: No lookup list in config" >>/dev/stderr; exit 1; }
 
+# set datetime format
+DATETIME_FORMAT=$(json_parse ".datetime_format" "$CONFIG" 2>/dev/null | sed "s/null//") || DATETIME_FORMAT='--iso-8601=seconds'
+fail_if_empty "$DATETIME_FORMAT" || DATETIME_FORMAT='--iso-8601=seconds'
+
 # init json arrays
 lookup_json="[]"
 errors_json="[]"
@@ -56,16 +60,18 @@ while read -r lookup_item; do
     # lookup and write to json
     for nameserver in "${nameservers[@]}"; do
         for domain in "${domains[@]}"; do
+            datetime=$(date $DATETIME_FORMAT)
             readarray -t domain_lookup < <(dns_lookup "$nameserver" "$domain" "$zone" "$type")
             formatted_lookup=$(array_to_json "${domain_lookup[@]}")
             formatted_result=$(jq -n -c \
+                --arg datetime "$datetime" \
                 --arg nameserver "$nameserver" \
                 --arg zone "$zone" \
                 --arg domain "$domain" \
                 --arg fqdn "$domain$zone" \
                 --arg type "$type" \
                 --argjson lookup "$formatted_lookup" \
-                '{nameserver:$nameserver,zone:$zone,domain:$domain,fqdn:$fqdn,type:$type,lookup:$lookup}')
+                '{datetime:$datetime,nameserver:$nameserver,zone:$zone,domain:$domain,fqdn:$fqdn,type:$type,lookup:$lookup}')
             lookup_json=$(json_append_array "$formatted_result" "$lookup_json")
         done
     done
