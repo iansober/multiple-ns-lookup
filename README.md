@@ -49,6 +49,8 @@ sequenceDiagram
 Required utilities:
 - jq
 - dig
+- grep
+- date
 
 Optional utilities:
 - yq - if YAML format used
