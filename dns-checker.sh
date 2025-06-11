@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# check required packages
+declare -a reqired_packages_try=(
+jq
+dig
+grep
+date
+sed
+)
+declare -a optional_packages_try=(
+yq
+)
+
+for package in "${reqired_packages_try[@]}"; do
+    command -v "$package" &>/dev/null || { echo "Error: Required package $package is not installed" >>/dev/stderr; exit 1; }
+done
+
+for package in "${optional_packages_try[@]}"; do
+    command -v "$package" &>/dev/null || echo "Warning: Optional package $package is not installed" >>/dev/stderr
+done
+
 # define script directory
 SCRIPT_DIR="${0%/*}"
 DOMAIN_VALIDATION_REGEX="^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$"
