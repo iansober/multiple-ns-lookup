@@ -2,6 +2,7 @@
 
 # define script directory
 SCRIPT_DIR="${0%/*}"
+DOMAIN_VALIDATION_REGEX="^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$"
 
 # load libraries
 source "$SCRIPT_DIR/lib/core.sh" || { echo "Could not load library core.sh" >>/dev/stderr; exit 1; }
@@ -57,18 +58,27 @@ while read -r lookup_item; do
         continue
         }
 
-    # lookup and write to json
     for nameserver in "${nameservers[@]}"; do
-        for domain in "${domains[@]}"; do
+        for domain_key in "${!domains[@]}"; do
+            # check if item in domains list looks like a domain name
+            [[ -z $(grep -iE "$DOMAIN_VALIDATION_REGEX" <<<"${domains[$domain_key]}$zone") ]] && { 
+                error_description="Domain name ${domains[$domain_key]} probably is not valid. Exclue ${domains[$domain_key]} from the domains list."
+                formatted_error=$(format_error "$error_description" "")
+                errors_json=$(json_append_array "$formatted_error" "$errors_json")
+                unset -v "domains[$domain_key]"
+                declare -p domains &>/dev/null
+                continue
+            }
+            # lookup domains
             datetime=$(date $DATETIME_FORMAT)
-            readarray -t domain_lookup < <(dns_lookup "$nameserver" "$domain" "$zone" "$type")
+            readarray -t domain_lookup < <(dns_lookup "$nameserver" "${domains[$domain_key]}" "$zone" "$type")
             formatted_lookup=$(array_to_json "${domain_lookup[@]}")
             formatted_result=$(jq -n -c \
                 --arg datetime "$datetime" \
                 --arg nameserver "$nameserver" \
                 --arg zone "$zone" \
-                --arg domain "$domain" \
-                --arg fqdn "$domain$zone" \
+                --arg domain "${domains[$domain_key]}" \
+                --arg fqdn "${domains[$domain_key]}$zone" \
                 --arg type "$type" \
                 --argjson lookup "$formatted_lookup" \
                 '{datetime:$datetime,nameserver:$nameserver,zone:$zone,domain:$domain,fqdn:$fqdn,type:$type,lookup:$lookup}')

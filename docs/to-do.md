@@ -1,8 +1,6 @@
 - Add packages pre-check
 - Add optional packages (eg: yq for yaml formatted files) pre-check
 
-- Add invalid domain names check
-
 - CSV output format
 - HTML output format
 
