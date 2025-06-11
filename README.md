@@ -51,6 +51,7 @@ Required utilities:
 - dig
 - grep
 - date
+- sed
 
 Optional utilities:
 - yq - if YAML format used
