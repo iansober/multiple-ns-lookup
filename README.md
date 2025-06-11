@@ -49,6 +49,9 @@ sequenceDiagram
 Required utilities:
 - jq
 - dig
+- grep
+- date
+- sed
 
 Optional utilities:
 - yq - if YAML format used
@@ -68,6 +71,7 @@ Default input is `config.json`, then try `config.yaml`.
 
 | Parameter | Required | Value | Exaple |
 | - | - | - | - |
+| `.datetime_format` | No | Date format in linux date command syntax. Dafault is `--iso-8601=seconds` | `"datetime_format": "-u --iso-8601=seconds"` |
 | `.output` | No | Allowed values: `json`, `pretty_json`, `yaml`. Default is `json`. | `"output": "json"` |
 | `.nameservers[]` | Yes | List of nameservers | `"nameservers": ["8.8.8.8","1.1.1.1"]` |
 | `.lookup[]` | Yes | List of dicts | `"lookup": [{"zone": "google.com","domains": ["mail","meet"]}]` |
@@ -78,6 +82,7 @@ Default input is `config.json`, then try `config.yaml`.
 YAML example:
 ```
 ---
+datetime_format: -u --iso-8601=seconds  # Date format. Optional.
 output: json            # Values: json, pretty_json, yaml. Default is json. Optional. 
 nameservers:            # List of nameservers. Required.
   - 8.8.8.8
@@ -97,6 +102,7 @@ lookup:                 # List of records. Required.
 JSON example:
 ```
 {
+  "datetime_format": "-u --iso-8601=seconds",
   "output": "json",
   "nameservers": [
     "8.8.8.8",
@@ -127,6 +133,7 @@ JSON example:
 Configuration:
 ```
 {
+  "datetime_format": "-u --iso-8601=seconds",
   "output": "pretty_json",
   "nameservers": [
     "8.8.8.8",
@@ -154,51 +161,47 @@ Output:
 {
   "data": [
     {
+      "datetime": "2025-06-11T18:36:55+00:00",
       "nameserver": "8.8.8.8",
       "zone": ".google.com",
       "domain": "mail",
       "fqdn": "mail.google.com",
       "type": "A",
       "lookup": [
-        "173.194.73.83",
-        "173.194.73.18",
-        "173.194.73.19",
-        "173.194.73.17"
+        "216.58.211.5"
       ]
     },
     {
+      "datetime": "2025-06-11T18:36:55+00:00",
       "nameserver": "8.8.8.8",
       "zone": ".google.com",
       "domain": "meet",
       "fqdn": "meet.google.com",
       "type": "A",
       "lookup": [
-        "173.194.221.113",
-        "173.194.221.102",
-        "173.194.221.100",
-        "173.194.221.139",
-        "173.194.221.138",
-        "173.194.221.101"
+        "142.250.74.174"
       ]
     },
     {
+      "datetime": "2025-06-11T18:36:55+00:00",
       "nameserver": "1.1.1.1",
       "zone": ".google.com",
       "domain": "mail",
       "fqdn": "mail.google.com",
       "type": "A",
       "lookup": [
-        "142.250.185.101"
+        "142.250.185.229"
       ]
     },
     {
+      "datetime": "2025-06-11T18:36:55+00:00",
       "nameserver": "1.1.1.1",
       "zone": ".google.com",
       "domain": "meet",
       "fqdn": "meet.google.com",
       "type": "A",
       "lookup": [
-        "142.250.186.78"
+        "142.250.185.206"
       ]
     }
   ],

@@ -38,7 +38,9 @@ stateDiagram
     tryNameservers --> lookup: nameservers list formed
     lookup: DNS lookup
     state lookup {
-        checkDomains --> lookupDNSRecord: if domains not empty
+        checkDomains --> validateDomains: if domain has valid name
+        validateDomains --> getDatetime
+        validateDomains --> lookupDNSRecord: if domains not empty
         lookupDNSRecord: lookup DNS record
     }
 
