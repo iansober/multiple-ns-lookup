@@ -146,4 +146,73 @@ if [[ $OUTPUT_FORMAT == "csv" ]]; then
     echo "$result_csv"
     error_list=$(json_parse ".errors" "$result_json")
     [[ -n $error_list ]] && printf "\nErrors:\n%s\n" "$error_list" >>/dev/stderr
-fi && exit 0
+    exit 0
+fi
+
+if [[ $OUTPUT_FORMAT == "html" ]]; then
+    cat <<EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DNS Lookup Report</title>
+  <style>
+$(cat "$SCRIPT_DIR"/assets/style.css)
+</style>
+</head>
+<body>
+  <h1>DNS Lookup Report</h1>
+  
+  <h2>DNS Query Results</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Nameserver</th>
+        <th>Zone</th>
+        <th>Domain</th>
+        <th>FQDN</th>
+        <th>Record Type</th>
+        <th>IP Addresses</th>
+      </tr>
+    </thead>
+    <tbody>
+EOF
+
+jq -r '.data[] | 
+  "<tr>
+    <td class=\"timestamp\">\(.datetime)</td>
+    <td>\(.nameserver)</td>
+    <td>\(.zone)</td>
+    <td>\(.domain)</td>
+    <td>\(.fqdn)</td>
+    <td>\(.type)</td>
+    <td>\(
+      if (.lookup | length) == 0 then 
+        "<span class=\"no-results\">No results</span>" 
+      else 
+        "<ul class=\"ip-list\">" + (.lookup[] | "<li>\(.)</li>") + "</ul>" 
+      end
+    )</td>
+  </tr>"' <<<"$result_json"
+
+cat <<EOF
+    </tbody>
+  </table>
+
+  <h2>Errors</h2>
+EOF
+
+jq -r '.errors[] | 
+  "<div class=\"error\">
+    <strong>Error:</strong> \(.description)
+    \(if .message != "" then "<br><span>\(.message)</span>" else "" end)
+  </div>"' <<<"$result_json"
+
+cat <<EOF
+</body>
+</html>
+EOF
+
+fi

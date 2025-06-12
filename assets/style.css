@@ -1,0 +1,64 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+h1 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+h2 {
+    color: #2c3e50;
+    margin-top: 30px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+th {
+    background-color: #3498db;
+    color: white;
+    text-align: left;
+    padding: 12px;
+}
+td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+}
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+tr:hover {
+    background-color: #f1f8fe;
+}
+.no-results {
+    color: #7f8c8d;
+    font-style: italic;
+}
+.error {
+    background-color: #ffecec;
+    border-left: 4px solid #e74c3c;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
+}
+.error strong {
+    color: #e74c3c;
+}
+.ip-list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+.ip-list li {
+    padding: 2px 0;
+}
+.timestamp {
+    white-space: nowrap;
+}
