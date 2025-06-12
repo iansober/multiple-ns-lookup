@@ -23,6 +23,7 @@ done
 # define script directory
 SCRIPT_DIR="${0%/*}"
 DOMAIN_VALIDATION_REGEX="^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$"
+NAMESERVER_VALIDATION_REGEX="^((25[0-5]|(2[0-4]|1[[:digit:]]|[1-9]|)[[:digit:]])\.?\b){4}$"
 
 # load libraries
 source "$SCRIPT_DIR/lib/core.sh" || { echo "Could not load library core.sh" >>/dev/stderr; exit 1; }
@@ -51,14 +52,22 @@ readarray -t nameservers < <(json_parse ".nameservers[]" "$CONFIG")
 fail_if_empty "${nameservers[*]}" || { echo "Error: Empty nameservers list" >>/dev/stderr; exit 1; }
 
 for key in "${!nameservers[@]}"; do
-    nameserver_lookup=$(dns_lookup "${nameservers[$key]}")
-    # delete from array if nameserver is unreachable or invalid
-    if [[  $nameserver_lookup =~ $dns_lookup_failure_pattern ]]; then
-        error_description="Error trying nameserver ${nameservers[$key]}. Exclude ${nameservers[$key]} from the nameservers list."
+    # validate nameserver ip, delete from array if invalid, lookup if valid
+    if [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX" <<<"${nameservers[$key]}") ]]; then
+        error_description="Invalid nameserver name: ${nameservers[$key]}. Exclude ${nameservers[$key]} from the nameservers list."
         formatted_error=$(format_error "$error_description" "$nameserver_lookup")
         errors_json=$(json_append_array "$formatted_error" "$errors_json")
     else
-        continue
+        # try to lookup dns server
+        nameserver_lookup=$(dns_lookup "${nameservers[$key]}")
+        # delete from array if nameserver is unreachable or invalid
+        if [[  $nameserver_lookup =~ $dns_lookup_failure_pattern ]]; then
+            error_description="Error trying nameserver ${nameservers[$key]}. Exclude ${nameservers[$key]} from the nameservers list."
+            formatted_error=$(format_error "$error_description" "$nameserver_lookup")
+            errors_json=$(json_append_array "$formatted_error" "$errors_json")
+        else
+            continue
+        fi
     fi
     unset -v "nameservers[$key]"
     declare -p nameservers &>/dev/null
