@@ -162,40 +162,37 @@ www.example.com-v4.edgesuite.net. a1422.dscr.akamai.net. 2.16.53.33 2.16.53.27
 ["140.82.121.3"]
 ```
 
-## function format_error
+## function json_append_error
 
 Formatting error messages to json with description and message keys.
 
 **Input**:
 1. Error description
 2. Error message/stderr
+3. Existing json array
 
-**Output**: json formatted error
+**Output**: json formatted error array with appended item
 
 ### Examples:
 
 #### 1. *Input*:
 ```
-'Error parsing domains list in item {"type":"MX"}' '+++ jq -c -r -M '\''.domains[]'\''
-jq: error (at <stdin>:1): Cannot iterate over null (null)'
+'Invalid nameserver name: 1277.0.0.1. Exclude 1277.0.0.1 from the nameservers list.' '' '[]'
 ```
 
 *Output*:
 ```
-{"description":"Error parsing domains list in item {\"type\":\"MX\"}","message":"+++ jq -c -r -M '\''.domains[]'\''\njq: error (at <stdin>:1): Cannot iterate over null (null)"}
+[{"description":"Invalid nameserver name: 1277.0.0.1. Exclude 1277.0.0.1 from the nameservers list.","message":""}]
 ```
 
 #### 2. *Input*:
 ```
-'Error trying nameserver 127.0.0.1. Exclude 127.0.0.1 from the nameservers list.' ';; communications error to 127.0.0.1#53: connection refused
-;; communications error to 127.0.0.1#53: connection refused
-;; communications error to 127.0.0.1#53: connection refused
-;; no servers could be reached'
+'Error parsing domains list in item {"domains":[]}' '' '[{"description":"Invalid nameserver name: 1277.0.0.1. Exclude 1277.0.0.1 from the nameservers list.","message":""}]'
 ```
 
 *Output*:
 ```
-{"description":"Error trying nameserver 127.0.0.1. Exclude 127.0.0.1 from the nameservers list.","message":";; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; no servers could be reached"}
+[{"description":"Invalid nameserver name: 1277.0.0.1. Exclude 1277.0.0.1 from the nameservers list.","message":""},{"description":"Error parsing domains list in item {\"domains\":[]}","message":""}]
 ```
 
 ## function json_append_array
@@ -212,20 +209,20 @@ Append item to existing array.
 
 #### 1. *Input*:
 ```
-'{"description":"Error trying nameserver 127.0.0.1. Exclude 127.0.0.1 from the nameservers list.","message":";; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; no servers could be reached"}' '[]'
+'{"datetime":"2025-06-12T17:35:28+00:00","nameserver":"8.8.8.8","zone":".google.com","domain":"mail","fqdn":"mail.google.com","type":"A","lookup":["216.58.211.5"]}' '[]'
 ```
 
 *Output*:
 ```
-[{"description":"Error trying nameserver 127.0.0.1. Exclude 127.0.0.1 from the nameservers list.","message":";; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; no servers could be reached"}]
+[{"datetime":"2025-06-12T17:35:28+00:00","nameserver":"8.8.8.8","zone":".google.com","domain":"mail","fqdn":"mail.google.com","type":"A","lookup":["216.58.211.5"]}]
 ```
 
 #### 2. *Input*:
 ```
-'{"description":"Error parsing domains list in item {\"type\":\"MX\"}","message":"+++ jq -c -r -M '\''.domains[]'\''\njq: error (at <stdin>:1): Cannot iterate over null (null)"}' '[{"description":"Error trying nameserver 127.0.0.1. Exclude 127.0.0.1 from the nameservers list.","message":";; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; no servers could be reached"}]'
+'{"datetime":"2025-06-12T17:35:28+00:00","nameserver":"8.8.8.8","zone":".google.com","domain":"meet","fqdn":"meet.google.com","type":"A","lookup":["142.250.74.174"]}' '[{"datetime":"2025-06-12T17:35:28+00:00","nameserver":"8.8.8.8","zone":".google.com","domain":"mail","fqdn":"mail.google.com","type":"A","lookup":["216.58.211.5"]}]'
 ```
 
 *Output*:
 ```
-[{"description":"Error trying nameserver 127.0.0.1. Exclude 127.0.0.1 from the nameservers list.","message":";; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; communications error to 127.0.0.1#53: connection refused\n;; no servers could be reached"},{"description":"Error parsing domains list in item {\"type\":\"MX\"}","message":"+++ jq -c -r -M '\''.domains[]'\''\njq: error (at <stdin>:1): Cannot iterate over null (null)"}]
+[{"datetime":"2025-06-12T17:35:28+00:00","nameserver":"8.8.8.8","zone":".google.com","domain":"mail","fqdn":"mail.google.com","type":"A","lookup":["216.58.211.5"]},{"datetime":"2025-06-12T17:35:28+00:00","nameserver":"8.8.8.8","zone":".google.com","domain":"meet","fqdn":"meet.google.com","type":"A","lookup":["142.250.74.174"]}]
 ```

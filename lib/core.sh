@@ -17,11 +17,11 @@ function array_to_json {
     jq -r -c -n '$ARGS.positional' --args "${array[@]}"
 }
 
-function format_error {
-    jq -n -c \
+function json_append_error {
+    jq -c \
         --arg err_descr "$1" \
         --arg err_msg "$2" \
-        '{"description":$err_descr,"message":$err_msg}'
+        '. += [{"description":$err_descr,"message":$err_msg}]' <<<"$3"
 }
 
 function json_append_array {

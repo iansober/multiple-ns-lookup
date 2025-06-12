@@ -52,26 +52,24 @@ dns_lookup_failure_pattern=".*failure.*|.*no servers could be reached.*"
 readarray -t nameservers < <(json_parse ".nameservers[]" "$CONFIG")
 fail_if_empty "${nameservers[*]}" || { echo "Error: Empty nameservers list" >>/dev/stderr; exit 1; }
 
-for key in "${!nameservers[@]}"; do
+for nameserver_key in "${!nameservers[@]}"; do
     # validate nameserver ip, delete from array if invalid, lookup if valid
-    if [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX" <<<"${nameservers[$key]}") ]] \
-    && [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX_IPV6" <<<"${nameservers[$key]}") ]]; then
-        error_description="Invalid nameserver name: ${nameservers[$key]}. Exclude ${nameservers[$key]} from the nameservers list."
-        formatted_error=$(format_error "$error_description" "$nameserver_lookup")
-        errors_json=$(json_append_array "$formatted_error" "$errors_json")
+    if [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX" <<<"${nameservers[$nameserver_key]}") ]] \
+    && [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX_IPV6" <<<"${nameservers[$nameserver_key]}") ]]; then
+        error_description="Invalid nameserver name: ${nameservers[$nameserver_key]}. Exclude ${nameservers[$nameserver_key]} from the nameservers list."
+        errors_json=$(json_append_error "$error_description" "" "$errors_json")
     else
         # try to lookup dns server
-        nameserver_lookup=$(dns_lookup "${nameservers[$key]}")
+        nameserver_lookup=$(dns_lookup "${nameservers[$nameserver_key]}")
         # delete from array if nameserver is unreachable or invalid
         if [[  $nameserver_lookup =~ $dns_lookup_failure_pattern ]]; then
-            error_description="Error trying nameserver ${nameservers[$key]}. Exclude ${nameservers[$key]} from the nameservers list."
-            formatted_error=$(format_error "$error_description" "$nameserver_lookup")
-            errors_json=$(json_append_array "$formatted_error" "$errors_json")
+            error_description="Error trying nameserver ${nameservers[$nameserver_key]}. Exclude ${nameservers[$nameserver_key]} from the nameservers list."
+            errors_json=$(json_append_error "$error_description" "$nameserver_lookup" "$errors_json")
         else
             continue
         fi
     fi
-    unset -v "nameservers[$key]"
+    unset -v "nameservers[$nameserver_key]"
     declare -p nameservers &>/dev/null
 done
 
@@ -84,8 +82,7 @@ while read -r lookup_item; do
     # skip if empty domains list, log error
     fail_if_empty "${domains[*]}" || { 
         error_description="Error parsing domains list in item $lookup_item"
-        formatted_error=$(format_error "$error_description" "$(json_parse ".domains[]" "$lookup_item" &>/dev/stdout)")
-        errors_json=$(json_append_array "$formatted_error" "$errors_json")
+        errors_json=$(json_append_error "$error_description" "" "$errors_json")
         continue
         }
 
@@ -94,8 +91,7 @@ while read -r lookup_item; do
             # check if item in domains list looks like a domain name
             [[ -z $(grep -iE "$DOMAIN_VALIDATION_REGEX" <<<"${domains[$domain_key]}$zone") ]] && { 
                 error_description="Domain name ${domains[$domain_key]} probably is not valid. Exclue ${domains[$domain_key]} from the domains list."
-                formatted_error=$(format_error "$error_description" "")
-                errors_json=$(json_append_array "$formatted_error" "$errors_json")
+                errors_json=$(json_append_error "$error_description" "" "$errors_json")
                 unset -v "domains[$domain_key]"
                 declare -p domains &>/dev/null
                 continue
@@ -148,6 +144,6 @@ if [[ $OUTPUT_FORMAT == "csv" ]]; then
             '"Datetime","Nameserver","DNS zone","FQDN","DNS record type","Lookup result"' && \
             jq -r '.[] | [.datetime, .nameserver, .zone, .fqdn, .type, .lookup] | @csv' <<<"$lookups_to_dict")
     echo "$result_csv"
-    error_list=$(jq .errors <<<"$result_json")
+    error_list=$(json_parse ".errors" "$result_json")
     [[ -n $error_list ]] && printf "\nErrors:\n%s\n" "$error_list" >>/dev/stderr
 fi && exit 0
