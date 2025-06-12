@@ -215,4 +215,5 @@ cat <<EOF
 </html>
 EOF
 
+exit 0
 fi
