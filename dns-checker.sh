@@ -137,4 +137,6 @@ if [[ $OUTPUT_FORMAT == "csv" ]]; then
             '"Datetime","Nameserver","DNS zone","FQDN","DNS record type","Lookup result"' && \
             jq -r '.[] | [.datetime, .nameserver, .zone, .fqdn, .type, .lookup] | @csv' <<<"$lookups_to_dict")
     echo "$result_csv"
+    error_list=$(jq .errors <<<"$result_json")
+    [[ -n $error_list ]] && printf "\nErrors:\n%s\n" "$error_list" >>/dev/stderr
 fi && exit 0
