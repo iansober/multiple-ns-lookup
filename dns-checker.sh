@@ -101,7 +101,13 @@ while read -r lookup_item; do
                 --arg fqdn "${domains[$domain_key]}$zone" \
                 --arg type "$type" \
                 --argjson lookup "$formatted_lookup" \
-                '{datetime:$datetime,nameserver:$nameserver,zone:$zone,domain:$domain,fqdn:$fqdn,type:$type,lookup:$lookup}')
+                    '{datetime:$datetime,
+                    nameserver:$nameserver,
+                    zone:$zone,
+                    domain:$domain,
+                    fqdn:$fqdn,
+                    type:$type,
+                    lookup:$lookup}')
             lookup_json=$(json_append_array "$formatted_result" "$lookup_json")
         done
     done
@@ -117,3 +123,18 @@ result_json=$(jq -n -c \
 [[ $OUTPUT_FORMAT == "json" ]] && { echo "$result_json"; exit 0; }
 [[ $OUTPUT_FORMAT == "pretty_json" ]] && { echo "$result_json" | jq; exit 0; }
 [[ $OUTPUT_FORMAT == "yaml" ]] && { yq --yaml-output <<<"$result_json"; exit 0; }
+
+if [[ $OUTPUT_FORMAT == "csv" ]]; then
+    lookups_to_dict=$(jq '
+            [.data[] | {datetime, nameserver, zone, fqdn, type, lookup} 
+            | if (.lookup | length) == 0 then
+                {datetime, nameserver, zone, fqdn, type, lookup: ""}
+            else
+                .lookup[] as $ip
+                | {datetime, nameserver, zone, fqdn, type, lookup: $ip}
+            end]' <<<"$result_json")
+    result_csv=$(echo \
+            '"Datetime","Nameserver","DNS zone","FQDN","DNS record type","Lookup result"' && \
+            jq -r '.[] | [.datetime, .nameserver, .zone, .fqdn, .type, .lookup] | @csv' <<<"$lookups_to_dict")
+    echo "$result_csv"
+fi && exit 0

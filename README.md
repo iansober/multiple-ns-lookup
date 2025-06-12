@@ -12,6 +12,7 @@ Currently supported output formats:
 - JSON
 - Pretty JSON
 - YAML
+- CSV
 
 ```mermaid
 sequenceDiagram
@@ -72,7 +73,7 @@ Default input is `config.json`, then try `config.yaml`.
 | Parameter | Required | Value | Exaple |
 | - | - | - | - |
 | `.datetime_format` | No | Date format in linux date command syntax. Dafault is `--iso-8601=seconds` | `"datetime_format": "-u --iso-8601=seconds"` |
-| `.output` | No | Allowed values: `json`, `pretty_json`, `yaml`. Default is `json`. | `"output": "json"` |
+| `.output` | No | Allowed values: `json`, `pretty_json`, `yaml`, `csv`. Default is `json`. | `"output": "json"` |
 | `.nameservers[]` | Yes | List of nameservers | `"nameservers": ["8.8.8.8","1.1.1.1"]` |
 | `.lookup[]` | Yes | List of dicts | `"lookup": [{"zone": "google.com","domains": ["mail","meet"]}]` |
 | `.lookup[].type` | No | Type of DNS record. Default is `A`. | `"type": "MX"` |
@@ -83,7 +84,7 @@ YAML example:
 ```
 ---
 datetime_format: -u --iso-8601=seconds  # Date format. Optional.
-output: json            # Values: json, pretty_json, yaml. Default is json. Optional. 
+output: json            # Values: json, pretty_json, yaml, csv. Default is json. Optional. 
 nameservers:            # List of nameservers. Required.
   - 8.8.8.8
   - 1.1.1.1
