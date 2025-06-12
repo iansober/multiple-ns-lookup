@@ -24,6 +24,7 @@ done
 SCRIPT_DIR="${0%/*}"
 DOMAIN_VALIDATION_REGEX="^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$"
 NAMESERVER_VALIDATION_REGEX="^((25[0-5]|(2[0-4]|1[[:digit:]]|[1-9]|)[[:digit:]])\.?\b){4}$"
+NAMESERVER_VALIDATION_REGEX_IPV6="^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$"
 
 # load libraries
 source "$SCRIPT_DIR/lib/core.sh" || { echo "Could not load library core.sh" >>/dev/stderr; exit 1; }
@@ -53,7 +54,8 @@ fail_if_empty "${nameservers[*]}" || { echo "Error: Empty nameservers list" >>/d
 
 for key in "${!nameservers[@]}"; do
     # validate nameserver ip, delete from array if invalid, lookup if valid
-    if [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX" <<<"${nameservers[$key]}") ]]; then
+    if [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX" <<<"${nameservers[$key]}") ]] \
+    && [[ -z $(grep -iE "$NAMESERVER_VALIDATION_REGEX_IPV6" <<<"${nameservers[$key]}") ]]; then
         error_description="Invalid nameserver name: ${nameservers[$key]}. Exclude ${nameservers[$key]} from the nameservers list."
         formatted_error=$(format_error "$error_description" "$nameserver_lookup")
         errors_json=$(json_append_array "$formatted_error" "$errors_json")
