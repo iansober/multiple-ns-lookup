@@ -10,7 +10,7 @@ function import_config {
 }
 
 function define_output {
-    local -a allowed_format=(json pretty_json yaml csv)
+    local -a allowed_format=(json pretty_json yaml csv html)
     local output_format
     output_format=$(jq -r -M .output <<<"$1" | sed "s/null/json/")
     if [[ ! "${allowed_format[*]}" =~ $output_format ]]; then 
